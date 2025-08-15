@@ -1,41 +1,52 @@
 package com.drivncook.service;
 
 import com.drivncook.model.LoyaltyCard;
-import java.util.*;
-import java.io.*;
+import com.drivncook.util.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.*;
 
 public class LoyaltyCardService {
-    private static final String FILE = "loyaltycards.json";
     private final ObjectMapper mapper = new ObjectMapper();
-    private List<LoyaltyCard> cards = new ArrayList<>();
 
-    public LoyaltyCardService() { load(); }
-
-    public List<LoyaltyCard> findAll() { return cards; }
-    public Optional<LoyaltyCard> findById(String id) {
-        return cards.stream().filter(c -> c.getId().equals(id)).findFirst();
-    }
-    public void save(LoyaltyCard card) {
-        findById(card.getId()).ifPresentOrElse(
-            c -> { cards.remove(c); cards.add(card); },
-            () -> cards.add(card)
-        );
-        persist();
-    }
-    public void delete(String id) {
-        cards.removeIf(c -> c.getId().equals(id));
-        persist();
-    }
-    private void load() {
+    public List<LoyaltyCard> findAll() {
         try {
-            File f = new File(FILE);
-            if (f.exists()) cards = mapper.readValue(f, new TypeReference<List<LoyaltyCard>>(){});
-        } catch (Exception e) { cards = new ArrayList<>(); }
+            String json = HttpUtil.get("/fidelity");
+            return mapper.readValue(json, new TypeReference<List<LoyaltyCard>>(){});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
-    private void persist() {
-        try { mapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE), cards); }
-        catch (Exception ignored) {}
+
+    public Optional<LoyaltyCard> findById(String id) {
+        try {
+            String json = HttpUtil.get("/fidelity/" + id);
+            LoyaltyCard card = mapper.readValue(json, LoyaltyCard.class);
+            return Optional.ofNullable(card);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public void save(LoyaltyCard card) {
+        try {
+            String json = mapper.writeValueAsString(card);
+            if (card.getId() == null || card.getId().isEmpty()) {
+                HttpUtil.post("/fidelity", json);
+            } else {
+                HttpUtil.post("/fidelity/" + card.getId(), json); // à adapter selon l'API (PUT ou POST)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(String id) {
+        try {
+            HttpUtil.delete("/fidelity/" + id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

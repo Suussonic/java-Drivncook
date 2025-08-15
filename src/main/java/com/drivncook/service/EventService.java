@@ -1,41 +1,52 @@
 package com.drivncook.service;
 
 import com.drivncook.model.Event;
-import java.util.*;
-import java.io.*;
+import com.drivncook.util.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.*;
 
 public class EventService {
-    private static final String FILE = "events.json";
     private final ObjectMapper mapper = new ObjectMapper();
-    private List<Event> events = new ArrayList<>();
 
-    public EventService() { load(); }
-
-    public List<Event> findAll() { return events; }
-    public Optional<Event> findById(String id) {
-        return events.stream().filter(e -> e.getId().equals(id)).findFirst();
-    }
-    public void save(Event event) {
-        findById(event.getId()).ifPresentOrElse(
-            e -> { events.remove(e); events.add(event); },
-            () -> events.add(event)
-        );
-        persist();
-    }
-    public void delete(String id) {
-        events.removeIf(e -> e.getId().equals(id));
-        persist();
-    }
-    private void load() {
+    public List<Event> findAll() {
         try {
-            File f = new File(FILE);
-            if (f.exists()) events = mapper.readValue(f, new TypeReference<List<Event>>(){});
-        } catch (Exception e) { events = new ArrayList<>(); }
+            String json = HttpUtil.get("/eventcustoms");
+            return mapper.readValue(json, new TypeReference<List<Event>>(){});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
-    private void persist() {
-        try { mapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE), events); }
-        catch (Exception ignored) {}
+
+    public Optional<Event> findById(String id) {
+        try {
+            String json = HttpUtil.get("/eventcustoms/" + id);
+            Event event = mapper.readValue(json, Event.class);
+            return Optional.ofNullable(event);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public void save(Event event) {
+        try {
+            String json = mapper.writeValueAsString(event);
+            if (event.getId() == null || event.getId().isEmpty()) {
+                HttpUtil.post("/eventcustoms", json);
+            } else {
+                HttpUtil.post("/eventcustoms/" + event.getId(), json); // à adapter selon l'API (PUT ou POST)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(String id) {
+        try {
+            HttpUtil.delete("/eventcustoms/" + id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

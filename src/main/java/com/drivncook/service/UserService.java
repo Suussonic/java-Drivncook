@@ -1,41 +1,52 @@
 package com.drivncook.service;
 
 import com.drivncook.model.User;
-import java.util.*;
-import java.io.*;
+import com.drivncook.util.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.*;
 
 public class UserService {
-    private static final String FILE = "users.json";
     private final ObjectMapper mapper = new ObjectMapper();
-    private List<User> users = new ArrayList<>();
 
-    public UserService() { load(); }
-
-    public List<User> findAll() { return users; }
-    public Optional<User> findById(String id) {
-        return users.stream().filter(u -> u.getId().equals(id)).findFirst();
-    }
-    public void save(User user) {
-        findById(user.getId()).ifPresentOrElse(
-            u -> { users.remove(u); users.add(user); },
-            () -> users.add(user)
-        );
-        persist();
-    }
-    public void delete(String id) {
-        users.removeIf(u -> u.getId().equals(id));
-        persist();
-    }
-    private void load() {
+    public List<User> findAll() {
         try {
-            File f = new File(FILE);
-            if (f.exists()) users = mapper.readValue(f, new TypeReference<List<User>>(){});
-        } catch (Exception e) { users = new ArrayList<>(); }
+            String json = HttpUtil.get("/users");
+            return mapper.readValue(json, new TypeReference<List<User>>(){});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
-    private void persist() {
-        try { mapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE), users); }
-        catch (Exception ignored) {}
+
+    public Optional<User> findById(String id) {
+        try {
+            String json = HttpUtil.get("/users/" + id);
+            User user = mapper.readValue(json, User.class);
+            return Optional.ofNullable(user);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public void save(User user) {
+        try {
+            String json = mapper.writeValueAsString(user);
+            if (user.getId() == null || user.getId().isEmpty()) {
+                HttpUtil.post("/users", json);
+            } else {
+                HttpUtil.post("/users/" + user.getId(), json); // à adapter selon l'API (PUT ou POST)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(String id) {
+        try {
+            HttpUtil.delete("/users/" + id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

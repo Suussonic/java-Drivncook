@@ -1,41 +1,52 @@
 package com.drivncook.service;
 
 import com.drivncook.model.Menu;
-import java.util.*;
-import java.io.*;
+import com.drivncook.util.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.*;
 
 public class MenuService {
-    private static final String FILE = "menus.json";
     private final ObjectMapper mapper = new ObjectMapper();
-    private List<Menu> menus = new ArrayList<>();
 
-    public MenuService() { load(); }
-
-    public List<Menu> findAll() { return menus; }
-    public Optional<Menu> findById(String id) {
-        return menus.stream().filter(m -> m.getId().equals(id)).findFirst();
-    }
-    public void save(Menu menu) {
-        findById(menu.getId()).ifPresentOrElse(
-            m -> { menus.remove(m); menus.add(menu); },
-            () -> menus.add(menu)
-        );
-        persist();
-    }
-    public void delete(String id) {
-        menus.removeIf(m -> m.getId().equals(id));
-        persist();
-    }
-    private void load() {
+    public List<Menu> findAll() {
         try {
-            File f = new File(FILE);
-            if (f.exists()) menus = mapper.readValue(f, new TypeReference<List<Menu>>(){});
-        } catch (Exception e) { menus = new ArrayList<>(); }
+            String json = HttpUtil.get("/menus");
+            return mapper.readValue(json, new TypeReference<List<Menu>>(){});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
-    private void persist() {
-        try { mapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE), menus); }
-        catch (Exception ignored) {}
+
+    public Optional<Menu> findById(String id) {
+        try {
+            String json = HttpUtil.get("/menus/" + id);
+            Menu menu = mapper.readValue(json, Menu.class);
+            return Optional.ofNullable(menu);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public void save(Menu menu) {
+        try {
+            String json = mapper.writeValueAsString(menu);
+            if (menu.getId() == null || menu.getId().isEmpty()) {
+                HttpUtil.post("/menus", json);
+            } else {
+                HttpUtil.put("/menus/" + menu.getId(), json);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(String id) {
+        try {
+            HttpUtil.delete("/menus/" + id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

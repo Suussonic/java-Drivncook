@@ -1,0 +1,148 @@
+/* Fond principal */
+.root {
+    -fx-background-color: #23272f;
+}
+
+/* TabPane (onglets) */
+.tab-pane {
+    -fx-background-color: #23272f;
+    -fx-tab-min-width: 120px;
+    -fx-tab-max-width: 200px;
+    -fx-tab-min-height: 40px;
+    -fx-tab-max-height: 40px;
+    -fx-padding: 0 0 0 0;
+    -fx-border-radius: 16px 16px 0 0;
+}
+.tab {
+    -fx-background-color: #181a20;
+    -fx-background-radius: 16px 16px 0 0;
+    -fx-padding: 0 18px;
+    -fx-font-size: 16px;
+    -fx-text-fill: #fff;
+    -fx-border-width: 0 0 2px 0;
+    -fx-border-color: transparent transparent #00d1b2 transparent;
+}
+.tab:selected {
+    -fx-background-color: #23272f;
+    -fx-text-fill: #00d1b2;
+    -fx-border-width: 0 0 3px 0;
+    -fx-border-color: transparent transparent #00d1b2 transparent;
+}
+
+/* Suppression des zones blanches et du focus bleu sur les onglets */
+.tab-pane, .tab-header-background, .tab-content-area, .tab-pane .tab-header-area {
+    -fx-background-color: #23272f;
+}
+.tab:selected:focused, .tab:focused {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+}
+
+/* ListView (menus) */
+.list-view {
+    -fx-background-color: #23272f;
+    -fx-control-inner-background: #23272f;
+    -fx-text-fill: #fff;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-padding: 8px;
+    -fx-border-width: 0;
+}
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #fff;
+    -fx-font-size: 15px;
+    -fx-padding: 10px 16px;
+    -fx-background-radius: 10px;
+}
+.list-cell:selected {
+    -fx-background-color: #209cee;
+    -fx-text-fill: #fff;
+    -fx-background-radius: 10px;
+}
+
+/* TextArea (détails) - suppression du fond blanc et bordure */
+.text-area, .text-area .content, .text-area .viewport {
+    -fx-background-color: #181a20;
+    -fx-control-inner-background: #181a20;
+    -fx-text-fill: #fff;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-font-size: 15px;
+    -fx-padding: 14px;
+    -fx-border-width: 0;
+}
+
+/* TextField (recherche) */
+.text-field {
+    -fx-background-color: #181a20;
+    -fx-control-inner-background: #181a20;
+    -fx-text-fill: #fff;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-font-size: 15px;
+    -fx-prompt-text-fill: #b5b5b5;
+    -fx-padding: 10px 14px;
+    -fx-border-width: 0;
+}
+
+/* ComboBox - suppression du fond blanc */
+.combo-box, .combo-box .list-cell, .combo-box .text-field {
+    -fx-background-color: #181a20;
+    -fx-control-inner-background: #181a20;
+    -fx-text-fill: #fff;
+}
+
+/* Label (titre, erreurs) */
+.label {
+    -fx-text-fill: #fff;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+.label.error {
+    -fx-text-fill: #ff3860;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+}
+
+/* Boutons arrondis */
+.button {
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-font-size: 15px;
+    -fx-padding: 10px 26px;
+    -fx-font-weight: bold;
+    -fx-background-insets: 0;
+    -fx-border-width: 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, #181a20, 2, 0.1, 0, 1);
+    -fx-min-width: 120px;
+    -fx-min-height: 38px;
+}
+.button.primary {
+    -fx-background-color: #00d1b2;
+    -fx-text-fill: #fff;
+}
+.button.info {
+    -fx-background-color: #209cee;
+    -fx-text-fill: #fff;
+}
+.button.danger {
+    -fx-background-color: #ff3860;
+    -fx-text-fill: #fff;
+}
+.button.light {
+    -fx-background-color: #f5f5f5;
+    -fx-text-fill: #23272f;
+}
+.button:hover {
+    -fx-opacity: 0.85;
+}
+
+/* Espacement général */
+.vbox {
+    -fx-spacing: 16px;
+    -fx-padding: 24px 32px 24px 32px;
+}

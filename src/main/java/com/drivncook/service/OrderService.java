@@ -1,41 +1,52 @@
 package com.drivncook.service;
 
 import com.drivncook.model.Order;
-import java.util.*;
-import java.io.*;
+import com.drivncook.util.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.*;
 
 public class OrderService {
-    private static final String FILE = "orders.json";
     private final ObjectMapper mapper = new ObjectMapper();
-    private List<Order> orders = new ArrayList<>();
 
-    public OrderService() { load(); }
-
-    public List<Order> findAll() { return orders; }
-    public Optional<Order> findById(String id) {
-        return orders.stream().filter(o -> o.getId().equals(id)).findFirst();
-    }
-    public void save(Order order) {
-        findById(order.getId()).ifPresentOrElse(
-            o -> { orders.remove(o); orders.add(order); },
-            () -> orders.add(order)
-        );
-        persist();
-    }
-    public void delete(String id) {
-        orders.removeIf(o -> o.getId().equals(id));
-        persist();
-    }
-    private void load() {
+    public List<Order> findAll() {
         try {
-            File f = new File(FILE);
-            if (f.exists()) orders = mapper.readValue(f, new TypeReference<List<Order>>(){});
-        } catch (Exception e) { orders = new ArrayList<>(); }
+            String json = HttpUtil.get("/orders");
+            return mapper.readValue(json, new TypeReference<List<Order>>(){});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
-    private void persist() {
-        try { mapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE), orders); }
-        catch (Exception ignored) {}
+
+    public Optional<Order> findById(String id) {
+        try {
+            String json = HttpUtil.get("/orders/" + id);
+            Order order = mapper.readValue(json, Order.class);
+            return Optional.ofNullable(order);
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    public void save(Order order) {
+        try {
+            String json = mapper.writeValueAsString(order);
+            if (order.getId() == null || order.getId().isEmpty()) {
+                HttpUtil.post("/orders", json);
+            } else {
+                HttpUtil.post("/orders/" + order.getId(), json); // à adapter selon l'API (PUT ou POST)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(String id) {
+        try {
+            HttpUtil.delete("/orders/" + id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

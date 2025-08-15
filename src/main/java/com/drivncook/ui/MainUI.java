@@ -14,14 +14,16 @@ public class MainUI extends Application {
             new Tab("Clients", new ClientAccountView()),
             new Tab("Menus", new MenuView()),
             new Tab("Plats", new DishView()),
-            new Tab("Commandes", new OrderView()),
-            new Tab("Fidélité", new LoyaltyView()),
-            new Tab("Événements", new EventView()),
-            new Tab("Avis", new ReviewView())
+            new Tab("Événements", new EventView())
         );
-        primaryStage.setTitle("Driv'n Cook - Gestion Clients");
-        primaryStage.setScene(new Scene(tabs, 900, 600));
-        primaryStage.show();
+    Scene scene = new Scene(tabs, 900, 600);
+    scene.getStylesheets().add(getClass().getResource("/style.css").toExternalForm());
+    primaryStage.setTitle("Driv'n Cook - Gestion Clients");
+    // Ajout du logo
+    primaryStage.getIcons().add(new javafx.scene.image.Image(getClass().getResourceAsStream("/logo.png")));
+    primaryStage.setScene(scene);
+    primaryStage.show();
     }
+
     public static void main(String[] args) { launch(args); }
 }

@@ -1,18 +1,23 @@
 package com.drivncook.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Menu {
+    @JsonProperty("_id")
     private String id;
     private String name;
-    private String description;
-    private String language;
+    private double price;
+    private String desc;
 
     public Menu() {}
 
-    public Menu(String id, String name, String description, String language) {
+    public Menu(String id, String name, double price, String desc) {
         this.id = id;
         this.name = name;
-        this.description = description;
-        this.language = language;
+        this.price = price;
+        this.desc = desc;
     }
 
     public String getId() { return id; }
@@ -21,9 +26,9 @@ public class Menu {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
 
-    public String getLanguage() { return language; }
-    public void setLanguage(String language) { this.language = language; }
+    public String getDesc() { return desc; }
+    public void setDesc(String desc) { this.desc = desc; }
 }
